@@ -676,7 +676,7 @@ html[data-theme="dark"] .discount-old-price{color:#b5bdc9!important}
   <section id="aboutSection" class="benefits" aria-label="عن المتجر"><div class="benefit"><span class="benefit-symbol">✧</span><div><strong>لمسة خاصة لكل هدية</strong><span>خيارات متنوعة من الطباعة والتصميم حسب الطلب</span></div></div><div class="benefit"><span class="benefit-symbol">♧</span><div><strong>هدايا تحكي قصة</strong><span>منتجات مطبوعة وهدايا بتفاصيل تعكس ذوقك</span></div></div><div class="benefit"><span class="benefit-symbol">▣</span><div><strong>الدفع عند الاستلام</strong><span>اطلب من المتجر بدون الحاجة لإنشاء حساب</span></div></div></section>
 </section>
 <section id="cartPage" class="hidden"><h2>سلة المشتريات</h2><div class="panel" id="cartItems"></div><div class="panel"><div class="totals"><span>مجموع المنتجات</span><span id="cartSubtotal"></span></div><div class="totals hidden" id="cartSavingLine"><span>وفّرت من خصومات المنتجات</span><span id="cartSavingValue"></span></div><button id="checkoutBtn">متابعة إلى تفاصيل التوصيل</button></div></section>
-<section id="checkoutPage" class="hidden"><h2>إتمام الطلب</h2><div class="steps"><div class="step on"><b>1</b>تفاصيل التوصيل</div><div class="step"><b>2</b>مراجعة الطلب</div><div class="step"><b>3</b>تم التأكيد</div></div><form id="checkoutForm" class="panel"><div class="formGrid"><label class="field">اسم الزبون *<input name="name" required minlength="2" maxlength="120"></label><label class="field">رقم الهاتف العراقي *<input name="phone" type="tel" required pattern="[0-9+ -]{10,20}" placeholder="07xxxxxxxxx"></label><label class="field">المحافظة *<select name="province" required><option value="">اختر المحافظة</option></select></label><label class="field">المدينة / المنطقة *<input name="district" required minlength="2" maxlength="120"></label><label class="field full">العنوان التفصيلي / أقرب نقطة دالة *<textarea name="address" required minlength="5" maxlength="500"></textarea></label><label class="field full">ملاحظات الطلب (اختياري)<textarea name="notes" maxlength="1000"></textarea></label></div>
+<section id="checkoutPage" class="hidden"><h2>إتمام الطلب</h2><div class="steps"><div class="step on"><b>1</b>تفاصيل التوصيل</div><div class="step"><b>2</b>مراجعة الطلب</div><div class="step"><b>3</b>تم التأكيد</div></div><form id="checkoutForm" class="panel" novalidate><div class="formGrid"><label class="field">اسم الزبون *<input name="name" required minlength="2" maxlength="120"></label><label class="field">رقم الهاتف العراقي *<input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="25" placeholder="07xxxxxxxxx"></label><label class="field">المحافظة *<select name="province" required><option value="">اختر المحافظة</option></select></label><label class="field">المدينة / المنطقة *<input name="district" required minlength="2" maxlength="120"></label><label class="field full">العنوان التفصيلي / أقرب نقطة دالة *<textarea name="address" required minlength="5" maxlength="500"></textarea></label><label class="field full">ملاحظات الطلب (اختياري)<textarea name="notes" maxlength="1000"></textarea></label></div>
 <div class="payment-select-box" id="paymentSelectBox">
   <h3>طريقة الدفع</h3>
   <label class="payment-choice"><input type="radio" name="payment_method" value="cod" checked> <span>💵 الدفع عند الاستلام</span></label>
@@ -691,7 +691,7 @@ html[data-theme="dark"] .discount-old-price{color:#b5bdc9!important}
     <small>لا ترفع صورة البطاقة أو الرقم السري. الوصل لا يعني تأكيد الدفع؛ نراجع وصول المبلغ أولاً.</small>
   </div>
 </div>
-<div class="notice" id="paymentNotice">الدفع عند الاستلام. لا يحتاج الزبون إلى حساب. تأكيد الهاتف برسالة غير مفعّل حالياً.</div><button id="sendOrder" type="submit">مراجعة الطلب</button><div id="checkoutMsg"></div></form><div id="review" class="panel hidden"><h3>مراجعة الطلب قبل الإرسال</h3><div id="reviewDetails"></div><div class="row"><button id="confirmOrder">تأكيد وإرسال الطلب</button><button class="soft" id="editOrder">تعديل التفاصيل</button></div></div></section>
+<div class="notice" id="paymentNotice">الدفع عند الاستلام. لا يحتاج الزبون إلى حساب. تأكيد الهاتف برسالة غير مفعّل حالياً.</div><button id="sendOrder" type="submit">مراجعة الطلب</button><div id="checkoutMsg" role="status" aria-live="polite" style="margin-top:12px"></div></form><div id="review" class="panel hidden"><h3>مراجعة الطلب قبل الإرسال</h3><div id="reviewDetails"></div><div class="row"><button id="confirmOrder">تأكيد وإرسال الطلب</button><button class="soft" id="editOrder">تعديل التفاصيل</button></div></div></section>
 <section id="donePage" class="hidden"><div class="panel" style="text-align:center;padding:55px 20px"><h1>✅ تم استلام طلبك</h1><p id="doneText"></p><div id="customerReceiptPreview" aria-live="polite"></div><button type="button" id="printCustomerReceipt" class="gold hidden">🖨️ طباعة الوصل / حفظ PDF</button> <button id="backShop">العودة للمتجر</button></div></section>
 <section id="adminPage" class="hidden"><div id="loginPanel" class="panel"><h2>تسجيل دخول الإدارة</h2><form id="loginForm" class="formGrid"><label class="field">البريد الإلكتروني<input type="email" name="email" required></label><label class="field">كلمة المرور<input type="password" name="password" required></label><div class="full"><button>دخول</button></div></form><div id="loginMsg"></div></div><div id="adminContent" class="hidden"><div class="row" style="justify-content:space-between"><h2>لوحة التحكم</h2><button class="soft" id="logout">تسجيل الخروج</button></div><nav class="adminNav"><button data-tab="overview">نظرة عامة</button><button data-tab="catalog">المنتجات</button><button data-tab="orders">الطلبات</button><button data-tab="settings">إعدادات المتجر</button></nav><div id="overviewTab"><div class="metrics" id="metrics"></div><div class="panel"><h3>آخر الطلبات</h3><div id="recentOrders"></div></div></div><div id="catalogTab" class="hidden"><div class="panel"><h3 id="productFormTitle">إضافة منتج</h3><form id="productForm" class="formGrid"><input type="hidden" name="id"><label class="field">اسم المنتج<input name="name" required maxlength="150"></label><label class="field">السعر بالدينار<input name="price" type="number" min="0" max="100000000" required></label><label class="field">التصنيف<input name="category" required maxlength="80" value="عام"></label><label class="field">رابط صورة المنتج HTTPS<input name="image_url" type="url" placeholder="https://..."></label><label class="field full">روابط الصور الإضافية (كل رابط HTTPS بسطر)<textarea name="image_urls" placeholder="https://example.com/photo2.jpg&#10;https://example.com/photo3.jpg"></textarea></label><label class="field full">وصف المنتج<textarea name="description" maxlength="1000"></textarea></label><label class="field">الحالة<select name="active"><option value="true">معروض</option><option value="false">مخفي</option></select></label><div class="full row"><button>حفظ المنتج</button><button type="button" class="soft" id="clearProduct">منتج جديد</button></div></form><div id="productMsg"></div></div><div class="panel"><h3>قائمة المنتجات</h3><div id="adminProducts"></div></div></div><div id="ordersTab" class="hidden"><div class="panel"><h3>إدارة الطلبات</h3><input class="search" id="orderSearch" placeholder="بحث بالاسم أو الهاتف أو رقم الطلب"><div id="adminOrders"></div></div></div><div id="settingsTab" class="hidden"><div class="panel"><h3>إعدادات المتجر</h3><form id="settingsForm" class="formGrid"><label class="field">اسم المتجر<input name="name" required></label><label class="field">الوصف<input name="subtitle"></label><label class="field">إنستغرام (رابط كامل)<input name="instagram"></label><label class="field">تيك توك (رابط كامل)<input name="tiktok"></label><label class="field">رقم واتساب<input name="whatsapp"></label><label class="field">أجرة التوصيل بالدينار<input type="number" name="delivery_fee" min="0" required></label><div class="full"><button>حفظ الإعدادات</button></div></form><div id="settingsMsg"></div></div></div></div></section>
 </main><div id="galleryOverlay" class="galleryOverlay hidden" role="dialog" aria-modal="true" aria-label="تفاصيل المنتج"><div class="galleryBox"><button type="button" class="galleryClose dark small" id="galleryClose" aria-label="إغلاق">✕</button><img id="galleryMain" class="galleryMain" alt=""><div id="galleryThumbs" class="galleryThumbs"></div><h2 id="galleryName"></h2><p id="galleryDescription" class="muted"></p><div id="galleryPrice" class="price"></div><button id="galleryAdd" type="button">＋ أضف إلى السلة</button></div></div><footer class="site-footer" id="contactSection"><div class="footer-inner"><div><h3>مطبعة ذكرى</h3><p>طباعة وتصميم وهدايا مميزة تناسب مناسباتك وذكرياتك.</p></div><div><h3>روابط سريعة</h3><div class="footer-links"><button type="button" data-nav="home">الرئيسية</button><button type="button" data-nav="products">جميع المنتجات</button><button type="button" data-nav="categories">التصنيفات</button></div></div><div><h3>تواصل ويانا</h3><div id="social" class="social" aria-label="روابط التواصل الاجتماعي"></div></div></div><div class="foot-note">© مطبعة ذكرى — جميع الحقوق محفوظة</div></footer>
@@ -1052,17 +1052,71 @@ $('checkoutForm').querySelectorAll('input[name="payment_method"]').forEach(r=>r.
 $('copyAccount').onclick=async()=>{const val=paymentSettings.transfer_details||'';try{await navigator.clipboard.writeText(val);$('copyAccount').textContent='تم النسخ';setTimeout(()=>$('copyAccount').textContent='نسخ المعلومات',1200)}catch{window.prompt('انسخ المعلومات:',val)}};
 updatePaymentUI();
 
-$('checkoutForm').onsubmit=async e=>{
-  e.preventDefault();if(!cartEntries().length)return;
-  try{await refreshDeliverySettings()}catch(err){return msg('checkoutMsg',err.message)}
-  if(chosenPayment()==='transfer'){
-    if(!(paymentSettings.enabled&&paymentSettings.transfer_details))return msg('checkoutMsg','خيار التحويل غير مفعل حالياً');
-    const file=$('receiptInput').files[0];
-    if(!file)return msg('checkoutMsg','اختار صورة وصل الدفع أولاً');
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024)return msg('checkoutMsg','الوصل لازم JPG أو PNG أو WEBP وبحجم أقل من 5 ميگابايت');
+// Always respond to the review button. Mobile native validation used to silently
+// block 'submit' (notably the old phone pattern) before this handler could run.
+function checkoutValidationError(form){
+  const validations=[
+    ['name','اسم الزبون',2,120],
+    ['province','المحافظة',1,50],
+    ['district','المدينة / المنطقة',2,120],
+    ['address','العنوان التفصيلي',5,500],
+    ['notes','الملاحظات',0,1000]
+  ];
+  for(const [key,label,min,max] of validations){
+    const field=form.elements[key],value=String(field?.value||'').trim();
+    if(value.length<min || value.length>max){
+      return {field,message:'تحقق من '+label+' ('+(min?('على الأقل '+min+' أحرف'):'الحد الأقصى '+max+' حرف')+').'};
+    }
   }
-  const fee=deliveryByProvince();if(fee===null)return msg('checkoutMsg','اختار المحافظة حتى نحسب أجرة التوصيل');
-  msg('checkoutMsg','');const f=new FormData(e.currentTarget),summary=$('reviewDetails');summary.replaceChildren();
+  const phoneField=form.elements.phone, phone=String(phoneField?.value||'').trim();
+  if(!/^[+0-9() \-]{7,25}$/.test(phone)){
+    return {field:phoneField,message:'رقم الهاتف غير صحيح، اكتب رقم عراقي مثل 07712345678.'};
+  }
+  return null;
+}
+function checkoutShowError(message,field){
+  msg('checkoutMsg',message);
+  $('checkoutMsg').scrollIntoView({block:'center',behavior:'auto'});
+  if(field)field.focus({preventScroll:true});
+}
+// Network problems must not leave the button appearing to do nothing.
+async function refreshDeliveryWithTimeout(){
+  let timer;
+  try{
+    return await Promise.race([
+      refreshDeliverySettings(),
+      new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('الاتصال بإعدادات التوصيل تأخر. تأكد من الإنترنت وحاول مرة ثانية.')),9000)})
+    ]);
+  }finally{clearTimeout(timer)}
+}
+$('checkoutForm').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.currentTarget,reviewButton=$('sendOrder');
+  if(reviewButton.disabled)return;
+  if(!cartEntries().length){checkoutShowError('السلة فارغة. أضف منتجاً أولاً.');return}
+  const invalid=checkoutValidationError(form);
+  if(invalid){checkoutShowError(invalid.message,invalid.field);return}
+  if(chosenPayment()==='transfer'){
+    if(!(paymentSettings.enabled&&paymentSettings.transfer_details)){
+      checkoutShowError('خيار التحويل غير مفعل حالياً');return;
+    }
+    const file=$('receiptInput').files[0];
+    if(!file){checkoutShowError('اختار صورة وصل الدفع أولاً',$('receiptInput'));return}
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
+      checkoutShowError('الوصل لازم JPG أو PNG أو WEBP وبحجم أقل من 5 ميگابايت');return;
+    }
+  }
+  const originalText=reviewButton.textContent;
+  reviewButton.disabled=true;
+  reviewButton.textContent='جارٍ تجهيز المراجعة...';
+  msg('checkoutMsg','جارٍ تجهيز مراجعة الطلب...','info');
+  try{
+    // Delivery settings are already downloaded when the store opens. Use those
+    // for instant review, but never show an unverified default as a real fee.
+    if(!deliveryConfigReady)await refreshDeliveryWithTimeout();
+    const fee=deliveryByProvince();
+    if(fee===null)throw new Error('تعذر حساب التوصيل. اختر المحافظة وتأكد من اتصال الإنترنت.');
+    const f=new FormData(form),summary=$('reviewDetails');summary.replaceChildren();
   for(const [label,key] of [['الاسم','name'],['الهاتف','phone'],['المحافظة','province'],['المنطقة','district'],['العنوان','address'],['الملاحظات','notes']])summary.append(node('p',label+': '+(f.get(key)||'—')));
   for(const {p,qty} of cartEntries()){
     const line=node('p',p.name+' × '+qty+' — '+money(p.price*qty));
@@ -1076,8 +1130,13 @@ $('checkoutForm').onsubmit=async e=>{
   summary.append(node('p','طريقة الدفع: '+(chosenPayment()==='transfer'?'تحويل إلكتروني - بانتظار المراجعة':'عند الاستلام')));
   summary.append(node('p','مجموع المنتجات: '+money(subtotal())));
   summary.append(node('p','أجرة التوصيل: '+money(fee)));
-  summary.append(node('h3','الإجمالي شاملاً التوصيل: '+money(subtotal()+fee)));
-  $('checkoutForm').classList.add('hidden');$('review').classList.remove('hidden');
+    summary.append(node('h3','الإجمالي شاملاً التوصيل: '+money(subtotal()+fee)));
+    msg('checkoutMsg','');
+    form.classList.add('hidden');
+    $('review').classList.remove('hidden');
+    $('review').scrollIntoView({block:'start',behavior:'auto'});
+  }catch(err){checkoutShowError(err?.message||'تعذر فتح مراجعة الطلب. حاول مرة ثانية.');}
+  finally{reviewButton.disabled=false;reviewButton.textContent=originalText;}
 };
 $('confirmOrder').onclick=async()=>{
   if(!db)return alert('لم يتم ربط Supabase');if(!cartEntries().length)return alert('السلة فارغة');
@@ -1086,7 +1145,7 @@ $('confirmOrder').onclick=async()=>{
   b.disabled=true;
   try {
     const oldFee=deliveryByProvince();
-    await refreshDeliverySettings();
+    await refreshDeliveryWithTimeout();
     if(oldFee!==deliveryByProvince()){
       $('review').classList.add('hidden');$('checkoutForm').classList.remove('hidden');
       updatePaymentUI();alert('تغيّرت أجرة التوصيل. راجع تفاصيل الطلب والإجمالي الجديد قبل الإرسال.');return;
