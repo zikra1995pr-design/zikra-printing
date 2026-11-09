@@ -721,7 +721,7 @@ themeBtn.addEventListener('click', () => {
 });
 const $=id=>document.getElementById(id),money=n=>Number(n||0).toLocaleString('en-US')+' IQD';
 function readLocalJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key)||'null');return v??fallback}catch{return fallback}}
-let products=[],cart=readLocalJSON('zikra_cart',{}),config={name:'مطبعة ذكرى',subtitle:'للطباعة والهدايا المميزة',delivery_fee:0},orders=[],items=[],isAdmin=false;
+let products=[],cart=readLocalJSON('zikra_cart',{}),config={name:'مطبعة ذكرى',subtitle:'للطباعة والهدايا المميزة',delivery_fee:0,delivery_fee_other:5000},orders=[],items=[],isAdmin=false;
 if(!cart||typeof cart!=='object'||Array.isArray(cart))cart={};
 cart=Object.fromEntries(Object.entries(cart).filter(([k,v])=>/^\d+$/.test(k)&&Number.isSafeInteger(v)&&v>0).map(([k,v])=>[k,Math.min(99,v)]));
 const safeUrl=u=>{try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return ''}};
@@ -935,8 +935,8 @@ function applyConfig(){
     }
   }
 }
-async function loadShop(){if(!db){$('products').append(node('p','أضف رابط ومفتاح Supabase في ملف config.js لتشغيل المتجر'));return}const [pr,st]=await Promise.all([db.from('store_products').select('*').eq('active',true).order('created_at',{ascending:false}),db.from('store_config').select('*').eq('id',1).single()]);if(pr.error){$('products').replaceChildren(node('p','تعذر تحميل المنتجات: '+pr.error.message));}else{products=pr.data||[];renderCategoryTiles();renderProducts()}if(st.data){config=st.data;applyConfig();updatePaymentUI()}saveCart()}
-$('search').oninput=renderProducts;$('homeBtn').onclick=()=>show('shop');$('backShop').onclick=()=>show('shop');$('cartBtn').onclick=()=>{renderCart();show('cart')};$('checkoutBtn').onclick=()=>{if(cartEntries().length){updatePaymentUI();show('checkout')}};
+async function loadShop(){if(!db){$('products').append(node('p','أضف رابط ومفتاح Supabase في ملف config.js لتشغيل المتجر'));return}const [pr,st]=await Promise.all([db.from('store_products').select('*').eq('active',true).order('created_at',{ascending:false}),db.from('store_config').select('*').eq('id',1).single()]);if(pr.error){$('products').replaceChildren(node('p','تعذر تحميل المنتجات: '+pr.error.message));}else{products=pr.data||[];renderCategoryTiles();renderProducts()}if(st.data){config=st.data;deliveryConfigReady=Number.isSafeInteger(Number(config.delivery_fee))&&Number.isSafeInteger(Number(config.delivery_fee_other));applyConfig();updatePaymentUI()}else{deliveryConfigReady=false;console.warn('Delivery configuration unavailable',st.error?.message||'No configuration row')}saveCart()}
+$('search').oninput=renderProducts;$('homeBtn').onclick=()=>show('shop');$('backShop').onclick=()=>show('shop');$('cartBtn').onclick=()=>{renderCart();show('cart')};$('checkoutBtn').onclick=async()=>{if(!cartEntries().length)return;const btn=$('checkoutBtn');btn.disabled=true;try{await refreshDeliverySettings();updatePaymentUI();show('checkout')}catch(err){alert(err.message+' — جرّب مرة ثانية')}finally{btn.disabled=false}};
 for(const province of ['بغداد','البصرة','نينوى','أربيل','النجف','كربلاء','ذي قار','ميسان','المثنى','القادسية','واسط','بابل','ديالى','الأنبار','صلاح الدين','كركوك','دهوك','السليمانية'])$('checkoutForm').elements.province.add(new Option(province,province));
 $('checkoutForm').onsubmit=e=>{e.preventDefault();if(!cartEntries().length)return;const f=new FormData(e.currentTarget),summary=$('reviewDetails');summary.replaceChildren();for(const [label,key] of [['الاسم','name'],['الهاتف','phone'],['المحافظة','province'],['المنطقة','district'],['العنوان','address'],['الملاحظات','notes']])summary.append(node('p',label+': '+(f.get(key)||'—')));for(const {p,qty} of cartEntries()){
     const line=node('p',p.name+' × '+qty+' — '+money(p.price*qty));
@@ -1018,10 +1018,24 @@ async function aSyncPaymentInit(){
   $('transferRecipient').textContent=paymentSettings.recipient_name?'اسم المستلم: '+paymentSettings.recipient_name:'';
   $('transferAccount').textContent=paymentSettings.transfer_details||'';
 }
-// الأسعار ثابتة حسب المحافظة، ويُعاد حساب الإجمالي لدى Supabase أيضاً.
+// التوصيل يُقرأ من إعدادات مطبعة ذكرى؛ قاعدة البيانات تعيد احتسابه لحماية السعر النهائي.
+let deliveryConfigReady=false;
 function deliveryByProvince(){
   const province=String($('checkoutForm').elements.province.value||'').trim();
-  return province ? (province==='البصرة' ? 3000 : 5000) : null;
+  if(!province || !deliveryConfigReady) return null;
+  const amount=Number(province==='البصرة' ? config.delivery_fee : config.delivery_fee_other);
+  return Number.isSafeInteger(amount) && amount>=0 ? amount : null;
+}
+async function refreshDeliverySettings(){
+  if(!db) throw new Error('ماكو اتصال بقاعدة البيانات');
+  const {data,error}=await db.from('store_config')
+    .select('delivery_fee,delivery_fee_other').eq('id',1).single();
+  if(error || !data) throw new Error('تعذر قراءة أجور التوصيل من إعدادات المتجر');
+  const basra=Number(data.delivery_fee), others=Number(data.delivery_fee_other);
+  if(!Number.isSafeInteger(basra) || !Number.isSafeInteger(others) || basra<0 || others<0)
+    throw new Error('أجور التوصيل غير صالحة في إعدادات المتجر');
+  config={...config,...data};
+  deliveryConfigReady=true;
 }
 $('checkoutForm').elements.province.addEventListener('change',()=>{
   updatePaymentUI();renderCart();
@@ -1038,8 +1052,9 @@ $('checkoutForm').querySelectorAll('input[name="payment_method"]').forEach(r=>r.
 $('copyAccount').onclick=async()=>{const val=paymentSettings.transfer_details||'';try{await navigator.clipboard.writeText(val);$('copyAccount').textContent='تم النسخ';setTimeout(()=>$('copyAccount').textContent='نسخ المعلومات',1200)}catch{window.prompt('انسخ المعلومات:',val)}};
 updatePaymentUI();
 
-$('checkoutForm').onsubmit=e=>{
+$('checkoutForm').onsubmit=async e=>{
   e.preventDefault();if(!cartEntries().length)return;
+  try{await refreshDeliverySettings()}catch(err){return msg('checkoutMsg',err.message)}
   if(chosenPayment()==='transfer'){
     if(!(paymentSettings.enabled&&paymentSettings.transfer_details))return msg('checkoutMsg','خيار التحويل غير مفعل حالياً');
     const file=$('receiptInput').files[0];
@@ -1069,6 +1084,16 @@ $('confirmOrder').onclick=async()=>{
   const f=new FormData($('checkoutForm')),b=$('confirmOrder');
   if(deliveryByProvince()===null)return alert('اختار المحافظة أولاً');
   b.disabled=true;
+  try {
+    const oldFee=deliveryByProvince();
+    await refreshDeliverySettings();
+    if(oldFee!==deliveryByProvince()){
+      $('review').classList.add('hidden');$('checkoutForm').classList.remove('hidden');
+      updatePaymentUI();alert('تغيّرت أجرة التوصيل. راجع تفاصيل الطلب والإجمالي الجديد قبل الإرسال.');return;
+    }
+  } catch(err){alert(err.message);return}
+  finally{b.disabled=false}
+  b.disabled=true;
   const method=chosenPayment();
   const receiptDraft={
     store_name:config.name, customer_name:f.get('name'),phone:f.get('phone'),
@@ -1088,14 +1113,12 @@ $('confirmOrder').onclick=async()=>{
       if(uploadErr)throw new Error('تعذر رفع الوصل: '+uploadErr.message);
     }
     const args={p_name:f.get('name'),p_phone:f.get('phone'),p_province:f.get('province'),p_district:f.get('district'),p_address:f.get('address'),p_notes:f.get('notes'),p_items:cartEntries().map(x=>({id:x.p.id,qty:x.qty})),p_payment_method:method,p_receipt_path:receiptPath};
-    let result=await db.rpc('store_checkout_with_payment',args);
-    // Compatibility: COD still works with the original store_checkout until the optional payment SQL is installed.
-    if(result.error && method==='cod' && (result.error.code==='PGRST202'||result.error.code==='42883')){
-      result=await db.rpc('store_checkout',{
-        p_name:args.p_name,p_phone:args.p_phone,p_province:args.p_province,
-        p_district:args.p_district,p_address:args.p_address,p_notes:args.p_notes,p_items:args.p_items
-      });
-    }
+    const result=method==='cod'
+      ? await db.rpc('store_checkout',{
+          p_name:args.p_name,p_phone:args.p_phone,p_province:args.p_province,
+          p_district:args.p_district,p_address:args.p_address,p_notes:args.p_notes,p_items:args.p_items
+        })
+      : await db.rpc('store_checkout_with_payment',args);
     if(result.error)throw result.error;
     const data=result.data;
     lastCustomerReceipt={...receiptDraft,id:data,created_at:new Date().toISOString()};

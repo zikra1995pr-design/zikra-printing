@@ -372,7 +372,7 @@ body.admin-mode .staffMessage.error{background:#461b2a;color:#ffe0e7}
   </div>
   <div class="panel"><h3>ترتيب الإعلانات</h3><div id="bannerList"></div></div>
 </div>
-<div id="ordersTab" class="hidden"><div class="panel"><h3>إدارة الطلبات</h3><input class="search" id="orderSearch" placeholder="بحث بالاسم أو الهاتف أو رقم الطلب"><div id="adminOrders"></div></div></div><div id="settingsTab" class="hidden"><div class="panel"><h3>إعدادات المتجر</h3><form id="settingsForm" class="formGrid"><label class="field">اسم المتجر<input name="name" required></label><label class="field">الوصف<input name="subtitle"></label><label class="field">إنستغرام (رابط كامل)<input name="instagram"></label><label class="field">تيك توك (رابط كامل)<input name="tiktok"></label><label class="field">رقم واتساب<input name="whatsapp"></label><label class="field">أجرة التوصيل بالدينار<input type="number" name="delivery_fee" min="0" required></label><div class="full"><button>حفظ الإعدادات</button></div></form><div id="settingsMsg"></div></div><div class="panel">
+<div id="ordersTab" class="hidden"><div class="panel"><h3>إدارة الطلبات</h3><input class="search" id="orderSearch" placeholder="بحث بالاسم أو الهاتف أو رقم الطلب"><div id="adminOrders"></div></div></div><div id="settingsTab" class="hidden"><div class="panel"><h3>إعدادات المتجر</h3><form id="settingsForm" class="formGrid"><label class="field">اسم المتجر<input name="name" required></label><label class="field">الوصف<input name="subtitle"></label><label class="field">إنستغرام (رابط كامل)<input name="instagram"></label><label class="field">تيك توك (رابط كامل)<input name="tiktok"></label><label class="field">رقم واتساب<input name="whatsapp"></label><label class="field">أجرة توصيل البصرة (د.ع)<input type="number" name="delivery_fee" min="0" max="10000000" step="1" inputmode="numeric" required></label><label class="field">أجرة توصيل باقي المحافظات (د.ع)<input type="number" name="delivery_fee_other" min="0" max="10000000" step="1" inputmode="numeric" required></label><p class="muted full" style="margin:0">الرقم 0 يعني توصيل مجاني. تظهر الأجرة للزبون عند مراجعة الطلب، وتنحسب من نفس إعدادات المتجر بالوصل.</p><div class="full"><button>حفظ الإعدادات</button></div></form><div id="settingsMsg"></div></div><div class="panel">
   <h3>💳 إعدادات التحويل الإلكتروني</h3>
   <p class="muted">التفعيل اختياري. تأكد من المصرف أن البيانات المدخلة تستقبل التحويل فعلاً. الزبون سيشوف هذه المعلومات عند اختيار التحويل.</p>
   <form id="paymentSettingsForm" class="formGrid">
@@ -408,7 +408,7 @@ const ready=/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
 const db=ready?createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 const $=id=>document.getElementById(id),money=n=>Number(n||0).toLocaleString('en-US')+' IQD';
 let isStaff=false,staffOrders=[],staffItems=[],staffImages=[];
-let products=[],cart=JSON.parse(localStorage.getItem('zikra_admin_cart')||'{}'),config={name:'مطبعة ذكرى',subtitle:'هدايا ومنتجات مميزة',delivery_fee:0},orders=[],items=[],isAdmin=false;
+let products=[],cart=JSON.parse(localStorage.getItem('zikra_admin_cart')||'{}'),config={name:'مطبعة ذكرى',subtitle:'هدايا ومنتجات مميزة',delivery_fee:0,delivery_fee_other:5000},orders=[],items=[],isAdmin=false;
 const safeUrl=u=>{try{const x=new URL(u);return x.protocol==='https:'?x.href:''}catch{return ''}};
 function msg(id,text,kind='error'){const e=$(id);e.textContent=text;e.className=text?'notice '+kind:''}
 function show(page){for(const id of ['shop','cart','checkout','done','admin','staff'])$(id+'Page').classList.toggle('hidden',id!==page);document.body.classList.toggle('admin-mode',(page==='admin'||page==='staff'));window.scrollTo(0,0)}
@@ -537,7 +537,7 @@ async function checkAuth(){
 }
 $('loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const {error}=await db.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});if(error)return msg('loginMsg',error.message);await checkAuth()};$('logout').onclick=async()=>{await zikraUnregisterPush();await db.auth.signOut();await checkAuth()};
 function tab(t){for(const k of ['overview','catalog','orders','settings'])$(k+'Tab').classList.toggle('hidden',k!==t)}document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
-async function loadAdmin(){const [p,o,i,c]=await Promise.all([db.from('store_products').select('*').order('created_at',{ascending:false}),db.from('store_orders').select('*').order('created_at',{ascending:false}).limit(500),db.from('store_order_items').select('*').limit(2000),db.from('store_config').select('*').eq('id',1).single()]);if(p.error||o.error||i.error){alert('خطأ في صلاحيات الإدارة: '+(p.error||o.error||i.error).message);return}products=p.data||[];orders=o.data||[];items=i.data||[];if(c.data)config=c.data;renderMetrics();renderAdminProducts();renderOrders();const form=$('settingsForm');for(const key of ['name','subtitle','instagram','tiktok','whatsapp','delivery_fee'])form.elements[key].value=config[key]??''}
+async function loadAdmin(){const [p,o,i,c]=await Promise.all([db.from('store_products').select('*').order('created_at',{ascending:false}),db.from('store_orders').select('*').order('created_at',{ascending:false}).limit(500),db.from('store_order_items').select('*').limit(2000),db.from('store_config').select('*').eq('id',1).single()]);if(p.error||o.error||i.error){alert('خطأ في صلاحيات الإدارة: '+(p.error||o.error||i.error).message);return}products=p.data||[];orders=o.data||[];items=i.data||[];if(c.data)config=c.data;renderMetrics();renderAdminProducts();renderOrders();const form=$('settingsForm');for(const key of ['name','subtitle','instagram','tiktok','whatsapp','delivery_fee','delivery_fee_other'])form.elements[key].value=config[key]??''}
 function renderMetrics(){
   const today=new Date().toDateString();
   const month=new Date().getMonth();
@@ -932,7 +932,11 @@ if(!root.children.length){
 }
 }  
 $('orderSearch').oninput=renderOrders;
-$('settingsForm').onsubmit=async e=>{e.preventDefault();const f=e.target,record={};for(const k of ['name','subtitle','instagram','tiktok','whatsapp'])record[k]=f.elements[k].value.trim();record.delivery_fee=Number(f.elements.delivery_fee.value);for(const k of ['instagram','tiktok'])if(record[k]&&!safeUrl(record[k]))return msg('settingsMsg','رابط '+k+' لازم يكون HTTPS');const {error}=await db.from('store_config').update(record).eq('id',1);if(error)return msg('settingsMsg',error.message);config={...config,...record};applyConfig();msg('settingsMsg','تم حفظ الإعدادات','success')};
+$('settingsForm').onsubmit=async e=>{e.preventDefault();const f=e.target,record={};for(const k of ['name','subtitle','instagram','tiktok','whatsapp'])record[k]=f.elements[k].value.trim();for(const k of ['delivery_fee','delivery_fee_other']){
+  const v=Number(f.elements[k].value);
+  if(!Number.isSafeInteger(v)||v<0||v>10000000)return msg('settingsMsg','أدخل أجرة توصيل صحيحة بين صفر و10,000,000 دينار');
+  record[k]=v;
+}for(const k of ['instagram','tiktok'])if(record[k]&&!safeUrl(record[k]))return msg('settingsMsg','رابط '+k+' لازم يكون HTTPS');const {error}=await db.from('store_config').update(record).eq('id',1);if(error)return msg('settingsMsg',error.message);config={...config,...record};applyConfig();msg('settingsMsg','تم حفظ الإعدادات','success')};
 
 // =================== الإعلانات وإثباتات التحويل ===================
 let banners=[],payments=[],paymentSettingsAdmin={enabled:false,provider_name:'ماستر كارد الرافدين',recipient_name:'',transfer_details:''};
